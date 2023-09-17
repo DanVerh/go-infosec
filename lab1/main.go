@@ -45,19 +45,19 @@ func stringToSlice(text string, parts int) (divSlice []string) {
 		if len(newStr) == 32 && i <= (parts-1)*32-1 { // append to 32 chars part
 			divSlice = append(divSlice, string(newStr))
 			newStr = "" // empty for next 32 characters
-		} else if i > (parts-1)*32-1 && len(newStr) == len(text)-(parts-1)*32 { // for the last part
+		} else if i > (parts-1)*32-1 { // for the last part
 			divSlice = append(divSlice, string(newStr))
 		}
 	}
 	return divSlice
 }
 
-// final ecryption function
+// final encryption function
 func encrypt(textSlice []string) (encryptedText string) {
 	var randInt int
 	var key []int
 	for _, textPart := range textSlice { // looping parts of slice, _ - not used index, textPart - part of slice
-		randInt = rand.Intn(32) // random int 0-32
+		randInt = rand.Intn(32-1+1) + 1 // random int 1-32
 		key = append(key, randInt)
 		for _, unicodeElement := range textPart {
 			unicodeElement = unicodeElement + int32(randInt) // moving in unicode format
