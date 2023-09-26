@@ -6,14 +6,12 @@ var message = "ЧЕГДОМИН 5000 Т"
 var gamma = "БІЛОМИР"
 
 func main() {
-	//fmt.Println(getLength(message))
-	//fmt.Println(getLength(gamma))
-	//fmt.Println(getPartsAmount(message, gamma))
+	fmt.Println(getLength(gamma))
+	fmt.Println(getLength(message))
+	fmt.Println(getPartsAmount(message, gamma))
+	fmt.Println(alphabetMap())
+	fmt.Println(gammaLengthToMeassage(message, gamma))
 
-	//fmt.Println(alphabetArr())
-
-	messageSlice := alphabetMap()
-	fmt.Println(messageSlice)
 }
 
 func getLength(text string) (length int) {
@@ -30,6 +28,25 @@ func getPartsAmount(message string, gamma string) (parts int) {
 	} else {
 		return getLength(message)/getLength(gamma) + 1
 	}
+}
+
+func gammaLengthToMeassage(message string, gamma string) (editedGamma string) {
+	parts := getPartsAmount(message, gamma)
+	if parts > 1 {
+		for p := 0; p <= parts; p++ {
+			editedGamma = gamma + gamma
+		}
+	}
+	lettersLeft := getLength(message) - getLength(editedGamma)
+	for i, r := range gamma {
+		if i <= lettersLeft-1 {
+			editedGamma += fmt.Sprintf("%c", r)
+		}
+		break
+	}
+	/*for i, u := range message {}*/
+
+	return editedGamma
 }
 
 func alphabetMap() (m map[string]int) {
