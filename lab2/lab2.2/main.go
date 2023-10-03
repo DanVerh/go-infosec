@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
-var message = "ЧЕГДОМИН 5000 Т"
-var gamma = "БІЛОМИР"
+var message = "0Ф26ОЯ7ЇВ 8ЖС6ММЬ"
+var gamma = "ДАЛІБОР"
 
 func main() {
 	fmt.Println("Message: " + message)
@@ -37,19 +40,24 @@ func alphabetMap() (m map[string]int) {
 		if count == 5 {
 			m[fmt.Sprintf("%c", 1168)] = count
 			unicode--
+
 		} else if count == 8 {
 			m[fmt.Sprintf("%c", 1028)] = count
 			unicode--
+
 		} else if count == 12 {
 			m[fmt.Sprintf("%c", 1030)] = count
 			unicode--
+
 		} else if count == 13 {
 			m[fmt.Sprintf("%c", 1111)] = count
 			unicode--
+
 		} else if unicode == 1066 || unicode == 1067 || unicode == 1069 {
 			count--
 		} else {
 			m[fmt.Sprintf("%c", unicode)] = count
+
 		}
 		count++
 	}
@@ -77,6 +85,7 @@ func gammaLengthToMessage(message string, gamma string) (editedGamma string) {
 		}
 		count++
 	}
+
 	return editedGamma
 }
 
@@ -93,8 +102,8 @@ func encrypt(message string, gamma string) string {
 	key := alphabetMap()
 	var ecryptedMessage []int
 	var ecryptedGamma []int
-	var encryptedSum []int
-	var ecryptedText string
+	var encryptedDiff []int
+	var decryptedText string
 
 	for _, r := range message {
 		ecryptedMessage = append(ecryptedMessage, key[fmt.Sprintf("%c", r)])
@@ -105,15 +114,15 @@ func encrypt(message string, gamma string) string {
 	}
 
 	for i := range ecryptedMessage {
-		encryptedSum = append(encryptedSum, ecryptedMessage[i]+ecryptedGamma[i])
-		if encryptedSum[i] > 44 {
-			encryptedSum[i] = encryptedSum[i] - 44
+		encryptedDiff = append(encryptedDiff, ecryptedMessage[i]-ecryptedGamma[i])
+		if encryptedDiff[i] < 0 {
+			encryptedDiff[i] = int(math.Abs(float64(encryptedDiff[i]))) + 44 - ecryptedGamma[i]
 		}
 	}
 
-	for i := range encryptedSum {
-		ecryptedText += getKeyByValue(key, encryptedSum[i])
+	for i := range encryptedDiff {
+		decryptedText += getKeyByValue(key, encryptedDiff[i])
 	}
 
-	return ecryptedText
+	return decryptedText
 }
