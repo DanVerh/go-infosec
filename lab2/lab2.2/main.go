@@ -13,7 +13,7 @@ func main() {
 	fmt.Println("Gamma: " + gamma + "\n")
 
 	gamma = gammaLengthToMessage(message, gamma)
-	fmt.Println("Encrypted message: " + encrypt(message, gamma))
+	fmt.Println("Decrypted message: " + decrypt(message, gamma))
 }
 
 func getLength(text string) (length int) {
@@ -98,7 +98,7 @@ func getKeyByValue(m map[string]int, value int) string {
 	return "" // Value not found in the map
 }
 
-func encrypt(message string, gamma string) string {
+func decrypt(message string, gamma string) string {
 	key := alphabetMap()
 	var ecryptedMessage []int
 	var ecryptedGamma []int
