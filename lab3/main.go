@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/big"
 )
 
 var p = 17
 var q = 29
 var message = "СБР23П"
+var cipher = []int{1, 172, 225, 32, 335, 443, 469, 379}
 
 func main() {
 	n := getN(p, q)
@@ -17,10 +19,13 @@ func main() {
 	d := getD(float64(f), float64(e))
 	privateKey := getKeyPair(d, n)
 
-	fmt.Println("Message: "+message, "\n")
 	fmt.Println("Public Key:", publicKey)
-	fmt.Println("Private Key:", privateKey, "\n")
-	fmt.Println("Message encrypted with RSA:", encryptRSA(publicKey, message))
+	fmt.Println("Message: " + message)
+	fmt.Println("Message encrypted with RSA public key:", encryptRSA(publicKey, message), "\n")
+
+	fmt.Println("Private Key:", privateKey)
+	fmt.Println("Encrypted Message:", cipher)
+	fmt.Println("Message decrypted with RSA private key:", decryptRSA(privateKey, cipher))
 }
 
 func getN(p int, q int) int {
@@ -126,8 +131,39 @@ func encryptRSA(publicKey [2]int, message string) []int {
 	var c int
 	for _, r := range message {
 		t := alphabet[fmt.Sprintf("%c", r)]
-		c = (int(math.Pow(float64(t), float64(publicKey[0]))) - (publicKey[1] * (int(math.Pow(float64(t), float64(publicKey[0]))) / publicKey[1])))
+		c = int(math.Pow(float64(t), float64(publicKey[0]))) - (publicKey[1] * (int(math.Pow(float64(t), float64(publicKey[0]))) / publicKey[1]))
 		encryptedMessage = append(encryptedMessage, c)
 	}
 	return encryptedMessage
+}
+
+func getKeyByValue(m map[string]int, value int) string {
+	for key, v := range m {
+		if v == value {
+			return key
+		}
+	}
+	return ""
+}
+
+func decryptRSA(privateKey [2]int, cipher []int) string {
+	var decryptedMessage string
+
+	for _, r := range cipher {
+		// Declare and set big int values
+		base := big.NewInt(int64(r))
+		exponent := big.NewInt(int64(privateKey[0]))
+		privateKey1 := big.NewInt(int64(privateKey[1]))
+
+		// Operations to decrypt step-by-step
+		expResult := new(big.Int).Exp(base, exponent, nil)
+		modResult := new(big.Int).Div(expResult, privateKey1)
+		product := new(big.Int).Mul(privateKey1, modResult)
+		result := new(big.Int).Sub(expResult, product).Int64()
+
+		// Decrypt by each symbol and add to string
+		decryptedSymbol := getKeyByValue(alphabetMap(), int(result))
+		decryptedMessage += decryptedSymbol
+	}
+	return decryptedMessage
 }
