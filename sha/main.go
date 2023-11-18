@@ -11,5 +11,6 @@ func main() {
 	inputLenBinary()
 	stringToSlice(result.String())
 	append48bytes()
-	fmt.Println(divSlice)
+	fmt.Println(w)
+	createSchedule()
 }
