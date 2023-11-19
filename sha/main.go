@@ -5,6 +5,7 @@ import "fmt"
 const input = "hello world"
 
 func main() {
+	fmt.Println("Message:", input)
 	inputBinary(input)
 	append1()
 	append0s()
@@ -12,5 +13,7 @@ func main() {
 	stringToSlice(result.String())
 	append48bytes()
 	createSchedule()
-	fmt.Println(w)
+	compression()
+	modifyValues()
+	fmt.Println("Hash value:", formatHashResults())
 }
