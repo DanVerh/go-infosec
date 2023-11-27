@@ -21,15 +21,19 @@ func main() {
 	img := generateImage(generateImageSize())
 	encodeImageToFile("image.png", img)
 	fmt.Println("Image genearated with 16-color palette")
+	fmt.Println("Probability distribution before encryption:", probabilityDistribution(img))
 
 	embedBits(img, message)
 	encodeImageToFile("imageEncrypted.png", img)
-	fmt.Println("Text encrypted in first row of pixels" + "\n")
+	fmt.Println("Text encrypted in first row of pixels")
+	fmt.Println("Probability distribution before encryption:", probabilityDistribution(img), "\n")
 
 	decryptedMessage := decryptMessage(img)
 	asciiDecryptedMessage := binaryToASCII(decryptedMessage)
 	fmt.Println("Decrypted binary message: " + decryptedMessage)
-	fmt.Println("Decrypted messag: " + asciiDecryptedMessage)
+	fmt.Println("Decrypted message: " + asciiDecryptedMessage)
+
+	probabilityDistribution(img)
 }
 
 // Convert message to binary string
@@ -140,4 +144,20 @@ func binaryToASCII(binaryString string) (asciiResult string) {
 	}
 
 	return asciiResult
+}
+
+func probabilityDistribution(img *image.Paletted) map[int]float64{
+	count := make(map[int]float64)
+
+	for x := 0; x < 10; x++ {
+		colorIndex := img.ColorIndexAt(x, 0)
+		count[int(colorIndex)]++
+	}
+
+	for i := range count {
+		count[i] = count[i]/10
+		i++
+	}
+
+	return count
 }
