@@ -14,54 +14,25 @@ import (
 var message = "Hello, world"
 
 func main() {
+	fmt.Println("Message: " + message)
 	message = convertToBinary()
-	fmt.Println(message)
+	fmt.Println("Binary message: " + message + "\n")
 
 	img := generateImage(generateImageSize())
+	encodeImageToFile("image.png", img)
+	fmt.Println("Image genearated with 16-color palette")
 
-	// Запис зображення в файл
-	file, err := os.Create("image.png")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	err = png.Encode(file, img)
-	if err != nil {
-		panic(err)
-	}
-
-	// Вбудовування однобітового повідомлення в зображення
 	embedBits(img, message)
+	encodeImageToFile("imageEncrypted.png", img)
+	fmt.Println("Text encrypted in first row of pixels" + "\n")
 
-	// Запис зображення в файл
-	file, err = os.Create("imageEncrypted.png")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	err = png.Encode(file, img)
-	if err != nil {
-		panic(err)
-	}
-
-	// Split binary string into 8-bit segments
-	var asciiResult string
-	for i := 0; i < len(decryptMessage(img)); i += 8 {
-		segment := decryptMessage(img)[i : i+8]
-		asciiChar, err := binaryToASCII(segment)
-		if err != nil {
-			fmt.Println("Error converting binary to ASCII:", err)
-			return
-		}
-		asciiResult += asciiChar
-	}
-
-	fmt.Println(asciiResult)
+	decryptedMessage := decryptMessage(img)
+	asciiDecryptedMessage := binaryToASCII(decryptedMessage)
+	fmt.Println("Decrypted binary message: " + decryptedMessage)
+	fmt.Println("Decrypted messag: " + asciiDecryptedMessage)
 }
 
-// Convert message to binary representation
+// Convert message to binary string
 func convertToBinary() string {
 	var result strings.Builder
 	for _, r := range message {
@@ -71,7 +42,7 @@ func convertToBinary() string {
 	return result.String()
 }
 
-// Generate image size: width = message length and random height
+// Generate image size: width = binary message length and random height < binary message length
 func generateImageSize() (width int, height int) {
 	width = len(message)
 	height = rand.Intn(len(message))
@@ -107,13 +78,26 @@ func generateImage(width, height int) *image.Paletted {
 		for x := 0; x < img.Bounds().Dx(); x++ {
 			// Generate a random color index
 			colorIndex := uint8(rand.Intn(len(img.Palette)))
-
 			// Set the color index for the current pixel
 			img.SetColorIndex(x, y, colorIndex)
 		}
 	}
 
 	return img
+}
+
+// Create image file and encode the data in it
+func encodeImageToFile(filename string, img *image.Paletted){
+	file, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	err = png.Encode(file, img)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Add one bit of message to each line of pixels in the first row
@@ -136,7 +120,6 @@ func decryptMessage(img *image.Paletted) string {
 	for x := 0; x < img.Bounds().Dx(); x++ {
 		// Get the color index for the current pixel
 		colorIndex := img.ColorIndexAt(x, 0)
-
 		// Extract the least significant bit and append it to the decrypted message
 		decryptedMessage.WriteByte((colorIndex & 1) + '0')
 	}
@@ -144,15 +127,17 @@ func decryptMessage(img *image.Paletted) string {
 	return decryptedMessage.String()
 }
 
-func binaryToASCII(binaryString string) (string, error) {
-	// Convert binary string to decimal
-	decimal, err := strconv.ParseInt(binaryString, 2, 64)
-	if err != nil {
-		return "", err
+// Convert binary string to ASCII
+func binaryToASCII(binaryString string) (asciiResult string) {
+	for i := 0; i < len(binaryString); i += 8 {
+		// Divide on 8-bit slices
+		segment := binaryString[i : i+8]
+		// Convert binary string to decimal
+		decimal, _ := strconv.ParseInt(segment, 2, 64)
+		// Convert decimal to ASCII
+		asciiChar := string(decimal)
+		asciiResult += asciiChar
 	}
 
-	// Convert decimal to ASCII
-	asciiChar := string(decimal)
-
-	return asciiChar, nil
+	return asciiResult
 }
