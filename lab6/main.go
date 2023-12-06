@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var t = 5
+var t = 10
 
 func main() {
 	startTime := time.Now()
@@ -21,12 +21,12 @@ func main() {
 	fmt.Printf("Prime number: %d\n", p)
 }
 
-func generateRandomInt() int {
+func getOddP() int {
 	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(100) + 2
+	return (rand.Intn(10000) + 1) | 1
 }
 
-func findMaxPowerOfTwo(n int) int {
+func getB(n int) int {
 	b := 0
 	for n%2 == 0 {
 		n /= 2
@@ -35,18 +35,29 @@ func findMaxPowerOfTwo(n int) int {
 	return b
 }
 
-func getM(p, b int) int {
-	return (p - 1) / int(math.Pow(2, float64(b)))
+func getM(p, b int) (m int) {
+	m = (p - 1) / int(math.Pow(2, float64(b)))
+	if m == 0 {
+		m = 1
+	}
+	return m
 }
 
-func generateRandomIntLessP(p int) int {
+func getA(p int) int {
 	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(p-1) + 2
+	return rand.Intn(p-1) + 1
 }
 
 func getZ(a, m, p int) int {
 	am := int(math.Pow(float64(a), float64(m)))
 	return am - p*(am/p)
+}
+
+func checkDivisionByPrimes(p int) bool {
+	if p%3 == 0 || p%5 == 0 || p%7 == 0 || p%11 == 0 {
+		return true
+	}
+	return false
 }
 
 func testRabinMiller(z, j, p, b int) (result bool) {
@@ -84,19 +95,21 @@ func generatePrimeNumber() (p int, i int) {
 	i = 0
 	for primeCheck == false {
 		i++
-		p = generateRandomInt()
-		for i := 1; i <= t; i++ {
-			b := findMaxPowerOfTwo(p - 1)
-			m := getM(p, b)
-			a := generateRandomIntLessP(p)
-			j := 0
-			z := getZ(a, m, p)
-			fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
-			primeCheck = testRabinMiller(z, j, p, b)
-			fmt.Println(primeCheck)
-			if primeCheck == false {
-				break
+		p = getOddP()
+		fmt.Println(p, checkDivisionByPrimes(p))
+		if checkDivisionByPrimes(p) == false && p != 1 {
+			for i := 1; i <= t; i++ {
+				b := getB(p - 1)
+				m := getM(p, b)
+				a := getA(p)
+				j := 0
+				z := getZ(a, m, p)
+				//fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
+				primeCheck = testRabinMiller(z, j, p, b)
+				//fmt.Println(primeCheck)
 			}
+		} else {
+			primeCheck = false
 		}
 	}
 	return p, i
