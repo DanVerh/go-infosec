@@ -7,16 +7,18 @@ import (
 	"time"
 )
 
+var t = 5
+
 func main() {
-	p := generateRandomInt()
-	b := findMaxPowerOfTwo(p - 1)
-	m := getM(p, b)
-	a := generateRandomIntLessP(p)
-	j := 0
-	z := getZ(a, m, p)
-	fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
-	testResult := testRabinMiller(z, j, p, b)
-	fmt.Println(testResult)
+	startTime := time.Now()
+	p, i := generatePrimeNumber()
+	endTime := time.Now()
+
+	elapsedTime := endTime.Sub(startTime).Seconds()
+
+	fmt.Printf("Prime number generation time: %.6f seconds\n", elapsedTime)
+	fmt.Printf("Amount of iterations: %d \n", i)
+	fmt.Printf("Prime number: %d\n", p)
 }
 
 func generateRandomInt() int {
@@ -75,4 +77,26 @@ func testRabinMiller(z, j, p, b int) (result bool) {
 	}
 
 	return result
+}
+
+func generatePrimeNumber() (p int, i int) {
+	primeCheck := false
+	i = 0
+	for primeCheck == false {
+		i++
+		p = generateRandomInt()
+		for i := 1; i <= t; i++ {
+			b := findMaxPowerOfTwo(p - 1)
+			m := getM(p, b)
+			a := generateRandomIntLessP(p)
+			j := 0
+			z := getZ(a, m, p)
+			//fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
+			primeCheck = testRabinMiller(z, j, p, b)
+			if primeCheck == false {
+				break
+			}
+		}
+	}
+	return p, i
 }
