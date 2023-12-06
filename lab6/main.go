@@ -91,8 +91,9 @@ func generatePrimeNumber() (p int, i int) {
 			a := generateRandomIntLessP(p)
 			j := 0
 			z := getZ(a, m, p)
-			//fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
+			fmt.Printf("p = %d, b = %d, m = %d, a = %d, j = %d, z = %d \n", p, b, m, a, j, z)
 			primeCheck = testRabinMiller(z, j, p, b)
+			fmt.Println(primeCheck)
 			if primeCheck == false {
 				break
 			}
